@@ -46,6 +46,7 @@ func main() {
 	})
 
 	go ProcessMusicQueue()
+	go StartYouTubeChatListener("https://www.youtube.com/watch?v=36YnV9STBqc")
 
 	e.Logger.Fatal(e.Start(":8080"))
 }

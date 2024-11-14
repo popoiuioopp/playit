@@ -1,3 +1,5 @@
+github.com/abhinavxd/youtube-live-chat-downloader/v2 v2.0.3 h1:rJRsl52IhgD5yaUBV7npuyqxB5h5TfILn7xs0/JV220=
+github.com/abhinavxd/youtube-live-chat-downloader/v2 v2.0.3/go.mod h1:TrUogg8mrebgMD/JU094CmSXn3yKrt+CZjiDL3YtmMw=
 github.com/gorilla/websocket v1.5.3 h1:saDtZ6Pbx/0u+bgYQ3q96pZgCzfhKXGPqt7kZ72aNNg=
 github.com/gorilla/websocket v1.5.3/go.mod h1:YR8l580nyteQvAITg2hZ9XVh4b55+EU/adAjf1fMHhE=
 github.com/labstack/echo v3.3.10+incompatible h1:pGRcYk231ExFAyoAjAfD85kQzRJCRI8bbnE7CX5OEgg=
