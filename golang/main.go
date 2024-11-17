@@ -14,9 +14,7 @@ import (
 
 var twitchClientID = os.Getenv("twitchClientID")
 var twitchClientSecret = os.Getenv("twitchClientSecret")
-var redirectURI = os.Getenv("redirectURI")
 var ytAPIKey = os.Getenv("ytAPIKey")
-var twitchToken = os.Getenv("twitchToken")
 
 type Config struct {
 	twitchClientID     string
@@ -35,7 +33,7 @@ func main() {
 
 	music.InitMusicQueue()
 	go music.ProcessMusicQueue()
-	go consumer.StartYouTubeChatListener("UC3H9YWQl2tNpVOa4AYfJexw", ytAPIKey)
+	go consumer.StartYouTubeChatListener("UC3H9YWQl2tNpVOa4AYfJexw", config.ytAPIKey)
 	token, err := consumer.GetTwitchCredential(config.twitchClientID, config.twitchClientSecret)
 	if err == nil {
 		consumer.ConnectAndConsumeTwitchChat("aiiwan", token)
