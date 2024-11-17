@@ -2,6 +2,7 @@ package music
 
 import (
 	"log"
+	"playit/realtime"
 	"sync"
 )
 
@@ -30,6 +31,8 @@ func AddSongRequest(song SongRequest) {
 	defer musicQueue.Unlock()
 	musicQueue.Queue = append(musicQueue.Queue, song)
 	log.Printf("Added song request: %+v\n", song)
+
+	realtime.BroadcastMessage(musicQueue.Queue)
 }
 
 // GetMusicQueue returns the current list of song requests

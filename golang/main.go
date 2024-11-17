@@ -36,6 +36,7 @@ func main() {
 
 	controllers.RegisterAPIRoutes(e, &config)
 	controllers.RegisterViewRoutes(e)
+	controllers.RegisterWSRoutes(e, &config)
 
 	e.Logger.Fatal(e.Start(":8080"))
 }
