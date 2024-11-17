@@ -1,4 +1,4 @@
-package main
+package messages
 
 import (
 	"strings"
@@ -40,7 +40,7 @@ func GetMessages() []Message {
 // - Content: "Hello World!"
 // - Channel: "#ka_beeja"
 // - Timestamp: The current time when the message was parsed.
-func parseMessage(rawMessage, channelName string) *Message {
+func ParseMessage(rawMessage, channelName string) *Message {
 	if strings.Contains(rawMessage, "PRIVMSG") {
 		// Split the tags and the actual message
 		parts := strings.SplitN(rawMessage, " PRIVMSG ", 2)

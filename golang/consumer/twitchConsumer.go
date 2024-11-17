@@ -1,4 +1,4 @@
-package main
+package consumer
 
 import (
 	"bytes"
@@ -6,6 +6,8 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+
+	"playit/messages"
 
 	"github.com/gorilla/websocket"
 )
@@ -17,7 +19,7 @@ type TokenResponse struct {
 	TokenType    string `json:"token_type"`
 }
 
-func exchangeCodeForToken(code string) (string, error) {
+func ExchangeCodeForToken(code, twitchClientID, twitchClientSecret, redirectURI string) (string, error) {
 	data := url.Values{}
 	data.Set("client_id", twitchClientID)
 	data.Set("client_secret", twitchClientSecret)
@@ -46,7 +48,7 @@ func exchangeCodeForToken(code string) (string, error) {
 	return tokenResp.AccessToken, nil
 }
 
-func connectAndConsumeTwitchChat(channelName string) {
+func ConnectAndConsumeTwitchChat(channelName, twitchToken string) {
 	conn, _, err := websocket.DefaultDialer.Dial("wss://irc-ws.chat.twitch.tv:443", nil)
 	if err != nil {
 		log.Fatalf("Error connecting to Twitch IRC: %v\n", err)
@@ -54,7 +56,7 @@ func connectAndConsumeTwitchChat(channelName string) {
 	defer conn.Close()
 
 	// Authenticate with PASS and NICK commands
-	if err := conn.WriteMessage(websocket.TextMessage, []byte("PASS oauth:"+config.Token)); err != nil {
+	if err := conn.WriteMessage(websocket.TextMessage, []byte("PASS oauth:"+twitchToken)); err != nil {
 		log.Println("Auth error:", err)
 		return
 	}
@@ -93,9 +95,9 @@ func connectAndConsumeTwitchChat(channelName string) {
 				return
 			}
 		} else {
-			parsedMessage := parseMessage(string(message), channel)
+			parsedMessage := messages.ParseMessage(string(message), channel)
 			if parsedMessage != nil {
-				HandleMessage(*parsedMessage)
+				messages.HandleMessage(*parsedMessage)
 			}
 		}
 	}

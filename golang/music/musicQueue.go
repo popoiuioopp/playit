@@ -1,4 +1,4 @@
-package main
+package music
 
 import (
 	"log"
@@ -16,10 +16,15 @@ var musicQueue = struct {
 	Queue []SongRequest
 }{}
 
-// Go channel for processing song requests
-var musicQueueChan = make(chan SongRequest, 100)
+var musicQueueChan chan SongRequest
 
-// AddSongRequest adds a song request to the music queue
+// Initialize the song request channel
+func InitMusicQueue() {
+	musicQueueChan = make(chan SongRequest, 100)
+	go ProcessMusicQueue()
+}
+
+// AddSongRequest adds a song request directly to the queue
 func AddSongRequest(song SongRequest) {
 	musicQueue.Lock()
 	defer musicQueue.Unlock()
@@ -32,6 +37,11 @@ func GetMusicQueue() []SongRequest {
 	musicQueue.RLock()
 	defer musicQueue.RUnlock()
 	return musicQueue.Queue
+}
+
+// EnqueueSongRequest sends a song request to the channel
+func EnqueueSongRequest(song SongRequest) {
+	musicQueueChan <- song
 }
 
 // ProcessMusicQueue listens for song requests from the channel and adds them to the queue

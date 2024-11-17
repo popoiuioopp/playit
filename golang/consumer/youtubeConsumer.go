@@ -1,4 +1,4 @@
-package main
+package consumer
 
 import (
 	"encoding/json"
@@ -6,6 +6,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"playit/messages"
 	"time"
 
 	YtChat "github.com/abhinavxd/youtube-live-chat-downloader/v2"
@@ -46,22 +47,22 @@ func consumeYouTubeChat(videoURL string) {
 		// Process each chat message
 		for _, msg := range chatMessages {
 			// Create a new message struct and add it to the store
-			parsedMessage := Message{
+			parsedMessage := messages.Message{
 				User:      msg.AuthorName,
 				Content:   msg.Message,
 				Timestamp: time.Now(),
 				Channel:   videoURL,
 			}
-			HandleMessage(parsedMessage)
+			messages.HandleMessage(parsedMessage)
 		}
 
 		time.Sleep(2 * time.Second)
 	}
 }
 
-func StartYouTubeChatListener(channelID string) {
+func StartYouTubeChatListener(channelID, ytAPIKey string) {
 	for {
-		liveURL, err := fetchLiveVideoURL(channelID)
+		liveURL, err := fetchLiveVideoURL(channelID, ytAPIKey)
 		if err != nil {
 			log.Printf("Error fetching live video URL for channel %s: %v\n", channelID, err)
 			time.Sleep(30 * time.Second) // Retry after 30 seconds
@@ -82,7 +83,7 @@ func StartYouTubeChatListener(channelID string) {
 	}
 }
 
-func fetchLiveVideoURL(channelID string) (string, error) {
+func fetchLiveVideoURL(channelID, ytAPIKey string) (string, error) {
 	if ytAPIKey == "" {
 		return "", fmt.Errorf("YouTube API key is missing")
 	}

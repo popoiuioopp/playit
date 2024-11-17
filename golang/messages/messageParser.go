@@ -1,13 +1,14 @@
-package main
+package messages
 
 import (
+	"playit/music"
 	"strings"
 )
 
 var prefix = "!ขอเพลง"
 
 // ParseSongRequest checks if the message is a song request based on the command prefix
-func ParseSongRequest(msg Message) *SongRequest {
+func ParseSongRequest(msg Message) *music.SongRequest {
 	if !strings.HasPrefix(msg.Content, prefix) {
 		return nil
 	}
@@ -27,7 +28,7 @@ func ParseSongRequest(msg Message) *SongRequest {
 		artist = strings.TrimSpace(parts[1])
 	}
 
-	return &SongRequest{
+	return &music.SongRequest{
 		Requester: msg.User,
 		SongName:  songName,
 		Artist:    artist,
@@ -38,7 +39,9 @@ func ParseSongRequest(msg Message) *SongRequest {
 func HandleMessage(msg Message) {
 	AddMessage(msg)
 
+	// Check if the message is a song request
 	if songRequest := ParseSongRequest(msg); songRequest != nil {
-		musicQueueChan <- *songRequest
+		// Use the EnqueueSongRequest function instead of directly accessing the channel
+		music.EnqueueSongRequest(*songRequest)
 	}
 }
