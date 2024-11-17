@@ -1,8 +1,11 @@
 package realtime
 
 import (
-	"encoding/json"
+	"bytes"
+	"context"
 	"log"
+	"playit/models"
+	"playit/views"
 	"sync"
 
 	"github.com/gorilla/websocket"
@@ -26,25 +29,28 @@ func UnregisterClient(client *websocket.Conn) {
 }
 
 // BroadcastMessage sends a message to all connected WebSocket clients
-func BroadcastMessage(message interface{}) {
-	messageJSON, err := json.Marshal(message)
-	log.Printf("Broadcasting message: %s\n", string(messageJSON))
-	if err != nil {
-		log.Printf("Error marshaling message: %v\n", err)
+func BroadcastMessage(queue []models.SongRequest) {
+	// Render the MusicCard component
+	var buf bytes.Buffer
+	if err := views.MusicCard(queue).Render(context.Background(), &buf); err != nil {
+		log.Printf("Error rendering MusicCard component: %v\n", err)
 		return
 	}
+	htmlContent := buf.String()
+	log.Printf("Broadcasting HTML content: %s\n", htmlContent)
 
 	clientsMutex.Lock()
 	defer clientsMutex.Unlock()
 
+	// Send the rendered HTML to all connected clients
 	for client := range clients {
-		err := client.WriteMessage(websocket.TextMessage, messageJSON)
+		err := client.WriteMessage(websocket.TextMessage, []byte(htmlContent))
 		if err != nil {
 			log.Printf("WebSocket write error: %v\n", err)
 			client.Close()
 			delete(clients, client)
 		} else {
-			log.Println("Message sent to client")
+			log.Println("HTML content sent to client")
 		}
 	}
 }

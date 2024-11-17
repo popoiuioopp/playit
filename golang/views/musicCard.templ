@@ -1,0 +1,11 @@
+package views
+
+import "playit/models"
+
+templ MusicCard(queue []models.SongRequest) {
+	<ul id="queue-list" hx-swap-oob="innerHTML">
+		for _, song := range queue {
+			<li><strong>{ song.SongName }</strong> by { song.Artist } (requested by { song.Requester })</li>
+		}
+	</ul>
+}

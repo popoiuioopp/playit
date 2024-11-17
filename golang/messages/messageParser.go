@@ -1,6 +1,7 @@
 package messages
 
 import (
+	"playit/models"
 	"playit/music"
 	"strings"
 )
@@ -8,7 +9,7 @@ import (
 var prefix = "!ขอเพลง"
 
 // ParseSongRequest checks if the message is a song request based on the command prefix
-func ParseSongRequest(msg Message) *music.SongRequest {
+func ParseSongRequest(msg Message) *models.SongRequest {
 	if !strings.HasPrefix(msg.Content, prefix) {
 		return nil
 	}
@@ -28,7 +29,7 @@ func ParseSongRequest(msg Message) *music.SongRequest {
 		artist = strings.TrimSpace(parts[1])
 	}
 
-	return &music.SongRequest{
+	return &models.SongRequest{
 		Requester: msg.User,
 		SongName:  songName,
 		Artist:    artist,

@@ -2,31 +2,26 @@ package music
 
 import (
 	"log"
+	"playit/models"
 	"playit/realtime"
 	"sync"
 )
 
-type SongRequest struct {
-	Requester string `json:"requester"`
-	SongName  string `json:"song_name"`
-	Artist    string `json:"artist,omitempty"`
-}
-
 var musicQueue = struct {
 	sync.RWMutex
-	Queue []SongRequest
+	Queue []models.SongRequest
 }{}
 
-var musicQueueChan chan SongRequest
+var musicQueueChan chan models.SongRequest
 
 // Initialize the song request channel
 func InitMusicQueue() {
-	musicQueueChan = make(chan SongRequest, 100)
+	musicQueueChan = make(chan models.SongRequest, 100)
 	go ProcessMusicQueue()
 }
 
 // AddSongRequest adds a song request directly to the queue
-func AddSongRequest(song SongRequest) {
+func AddSongRequest(song models.SongRequest) {
 	musicQueue.Lock()
 	defer musicQueue.Unlock()
 	musicQueue.Queue = append(musicQueue.Queue, song)
@@ -36,14 +31,14 @@ func AddSongRequest(song SongRequest) {
 }
 
 // GetMusicQueue returns the current list of song requests
-func GetMusicQueue() []SongRequest {
+func GetMusicQueue() []models.SongRequest {
 	musicQueue.RLock()
 	defer musicQueue.RUnlock()
 	return musicQueue.Queue
 }
 
 // EnqueueSongRequest sends a song request to the channel
-func EnqueueSongRequest(song SongRequest) {
+func EnqueueSongRequest(song models.SongRequest) {
 	musicQueueChan <- song
 }
 
