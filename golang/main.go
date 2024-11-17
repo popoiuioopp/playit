@@ -4,13 +4,15 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/labstack/echo/v4"
 )
 
-var clientID = "bfvngi6rb53iyni7eayjk0tr26ubw8"
-var clientSecret = "d3l7x624hbd946b52o8ysfdk29xgj4"
-var redirectURI = "http://localhost:8080/auth/callback"
+var twitchClientID = os.Getenv("twitchClientID")
+var twitchClientSecret = os.Getenv("twitchClientSecret")
+var redirectURI = os.Getenv("redirectURI")
+var ytAPIKey = os.Getenv("ytAPIKey")
 
 type Config struct {
 	Token string
@@ -27,7 +29,7 @@ func main() {
 
 	e.GET("/auth", func(c echo.Context) error {
 		authURL := fmt.Sprintf("https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=%s&redirect_uri=%s&scope=chat:read+chat:edit",
-			clientID, redirectURI)
+			twitchClientID, redirectURI)
 		return c.Redirect(http.StatusFound, authURL)
 	})
 
@@ -46,7 +48,7 @@ func main() {
 	})
 
 	go ProcessMusicQueue()
-	go StartYouTubeChatListener("https://www.youtube.com/watch?v=36YnV9STBqc")
+	go StartYouTubeChatListener("UC3H9YWQl2tNpVOa4AYfJexw")
 
 	e.Logger.Fatal(e.Start(":8080"))
 }
@@ -65,7 +67,7 @@ func handleCallback(c echo.Context) error {
 
 	storeToken(token)
 
-	go connectAndConsumeTwitchChat("#ka_beeja")
+	go connectAndConsumeTwitchChat("#midlin_made")
 
 	return c.JSON(http.StatusOK, map[string]string{"access_token": token})
 }

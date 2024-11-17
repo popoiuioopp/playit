@@ -20,8 +20,8 @@ type TokenResponse struct {
 
 func exchangeCodeForToken(code string) (string, error) {
 	data := url.Values{}
-	data.Set("client_id", clientID)
-	data.Set("client_secret", clientSecret)
+	data.Set("client_id", twitchClientID)
+	data.Set("client_secret", twitchClientSecret)
 	data.Set("code", code)
 	data.Set("grant_type", "authorization_code")
 	data.Set("redirect_uri", redirectURI)
