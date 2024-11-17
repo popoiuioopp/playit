@@ -1,12 +1,14 @@
 package controllers
 
 import (
-	"encoding/json"
+	"bytes"
+	"context"
 	"log"
 	"net/http"
 	"playit/models"
 	"playit/music"
 	"playit/realtime"
+	"playit/views"
 
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
@@ -34,11 +36,15 @@ func HandleWebSocket(c echo.Context) error {
 	realtime.RegisterClient(ws)
 	log.Println("Client connected")
 
-	// Send the current music queue to the newly connected client
+	// Render the initial music queue as HTML and send it to the client
 	initialQueue := music.GetMusicQueue()
-	messageJSON, err := json.Marshal(initialQueue)
-	if err == nil {
-		ws.WriteMessage(websocket.TextMessage, messageJSON)
+	var buf bytes.Buffer
+	if err := views.MusicCard(initialQueue).Render(context.Background(), &buf); err != nil {
+		log.Printf("Error rendering MusicCard component: %v\n", err)
+	} else {
+		htmlContent := buf.String()
+		log.Printf("Sending initial HTML content: %s\n", htmlContent)
+		ws.WriteMessage(websocket.TextMessage, []byte(htmlContent))
 	}
 
 	// Listen for client disconnection
