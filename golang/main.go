@@ -1,11 +1,11 @@
 package main
 
 import (
-	"log"
 	"os"
 
 	"playit/consumer"
 	"playit/controllers"
+	"playit/models"
 	"playit/music"
 
 	"github.com/labstack/echo/v4"
@@ -14,17 +14,17 @@ import (
 var twitchClientID = os.Getenv("twitchClientID")
 var twitchClientSecret = os.Getenv("twitchClientSecret")
 var ytAPIKey = os.Getenv("ytAPIKey")
+var redirectURI = os.Getenv("redirectURI")
+var twitchChannelName = "ka_beeja"
+var youtubeChannelId = "UC3H9YWQl2tNpVOa4AYfJexw"
 
-type Config struct {
-	twitchClientID     string
-	twitchClientSecret string
-	ytAPIKey           string
-}
-
-var config = Config{
-	twitchClientID:     twitchClientID,
-	twitchClientSecret: twitchClientSecret,
-	ytAPIKey:           ytAPIKey,
+var config = models.Config{
+	TwitchClientID:     twitchClientID,
+	TwitchClientSecret: twitchClientSecret,
+	YtAPIKey:           ytAPIKey,
+	RedirectURI:        redirectURI,
+	TwitchChannelName:  twitchChannelName,
+	YoutubeChannelId:   youtubeChannelId,
 }
 
 func main() {
@@ -32,15 +32,9 @@ func main() {
 
 	music.InitMusicQueue()
 	go music.ProcessMusicQueue()
-	go consumer.StartYouTubeChatListener("UC3H9YWQl2tNpVOa4AYfJexw", config.ytAPIKey)
-	token, err := consumer.GetTwitchCredential(config.twitchClientID, config.twitchClientSecret)
-	if err == nil {
-		go consumer.ConnectAndConsumeTwitchChat("aiiwan", token)
-	} else {
-		log.Printf("An Error occurs on twitch consumer %v\n", err)
-	}
+	go consumer.StartYouTubeChatListener("UC3H9YWQl2tNpVOa4AYfJexw", config.YtAPIKey)
 
-	controllers.RegisterAPIRoutes(e)
+	controllers.RegisterAPIRoutes(e, &config)
 	controllers.RegisterViewRoutes(e)
 
 	e.Logger.Fatal(e.Start(":8080"))
