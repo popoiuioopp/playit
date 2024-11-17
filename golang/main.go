@@ -34,6 +34,8 @@ func main() {
 	go music.ProcessMusicQueue()
 	go consumer.StartYouTubeChatListener("UC3H9YWQl2tNpVOa4AYfJexw", config.YtAPIKey)
 
+	e.Static("/static", "public")
+
 	controllers.RegisterAPIRoutes(e, &config)
 	controllers.RegisterViewRoutes(e)
 	controllers.RegisterWSRoutes(e, &config)
