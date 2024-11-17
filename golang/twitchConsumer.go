@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"net/url"
@@ -78,7 +77,7 @@ func connectAndConsumeTwitchChat(channelName string) {
 		return
 	}
 
-	fmt.Printf("Connected to %s chat\n", channel)
+	log.Printf("Connected to %s chat\n", channel)
 
 	// Listen for messages from Twitch
 	for {
