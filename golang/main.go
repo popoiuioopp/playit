@@ -11,10 +11,10 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-var twitchClientID = os.Getenv("twitchClientID")
-var twitchClientSecret = os.Getenv("twitchClientSecret")
-var ytAPIKey = os.Getenv("ytAPIKey")
-var redirectURI = os.Getenv("redirectURI")
+var twitchClientID = os.Getenv("TwitchClientID")
+var twitchClientSecret = os.Getenv("TwitchClientSecret")
+var ytAPIKey = os.Getenv("YtAPIKey")
+var redirectURI = os.Getenv("RedirectURI")
 var twitchChannelName = "ka_beeja"
 var youtubeChannelId = "UC3H9YWQl2tNpVOa4AYfJexw"
 

@@ -28,6 +28,7 @@ func UnregisterClient(client *websocket.Conn) {
 // BroadcastMessage sends a message to all connected WebSocket clients
 func BroadcastMessage(message interface{}) {
 	messageJSON, err := json.Marshal(message)
+	log.Printf("Broadcasting message: %s\n", string(messageJSON))
 	if err != nil {
 		log.Printf("Error marshaling message: %v\n", err)
 		return
@@ -42,6 +43,8 @@ func BroadcastMessage(message interface{}) {
 			log.Printf("WebSocket write error: %v\n", err)
 			client.Close()
 			delete(clients, client)
+		} else {
+			log.Println("Message sent to client")
 		}
 	}
 }

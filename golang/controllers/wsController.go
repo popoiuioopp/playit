@@ -1,9 +1,11 @@
 package controllers
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 	"playit/models"
+	"playit/music"
 	"playit/realtime"
 
 	"github.com/gorilla/websocket"
@@ -31,6 +33,13 @@ func HandleWebSocket(c echo.Context) error {
 
 	realtime.RegisterClient(ws)
 	log.Println("Client connected")
+
+	// Send the current music queue to the newly connected client
+	initialQueue := music.GetMusicQueue()
+	messageJSON, err := json.Marshal(initialQueue)
+	if err == nil {
+		ws.WriteMessage(websocket.TextMessage, messageJSON)
+	}
 
 	// Listen for client disconnection
 	for {

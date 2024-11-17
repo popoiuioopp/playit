@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
 	"playit/consumer"
@@ -49,11 +48,13 @@ func handleAuthCallback(c echo.Context, configs *models.Config) error {
 	}
 
 	// Exchange the authorization code for a user access token
-	token, err := consumer.ExchangeCodeForToken(code, configs.TwitchClientID, configs.TwitchClientSecret, configs.RedirectURI)
-	if err != nil {
-		log.Printf("Error exchanging code for token: %v\n", err)
-		return c.String(http.StatusInternalServerError, "Error retrieving access token")
-	}
+	// token, err := consumer.ExchangeCodeForToken(code, configs.TwitchClientID, configs.TwitchClientSecret, configs.RedirectURI)
+	// if err != nil {
+	// 	log.Printf("Error exchanging code for token: %v\n", err)
+	// 	return c.String(http.StatusInternalServerError, "Error retrieving access token")
+	// }
+
+	token := "weoali93356g04vm9534u61b05sxow"
 
 	// Store the token globally
 	configs.TwitchToken = token

@@ -8,5 +8,9 @@ templ HomeContent() {
 	<div>
 		<h2>Welcome to the Music Request App!</h2>
 		<p>Start requesting your favorite songs now!</p>
+		<div id="music-queue">
+			<h2>Current Music Queue</h2>
+			<ul hx-ext="ws" ws-connect="/ws/queue" hx-swap-oob="true" id="queue-list"></ul>
+		</div>
 	</div>
 }
