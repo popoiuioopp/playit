@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-	"log"
 	"net/http"
 	"os"
 
@@ -17,15 +15,22 @@ var twitchClientID = os.Getenv("twitchClientID")
 var twitchClientSecret = os.Getenv("twitchClientSecret")
 var redirectURI = os.Getenv("redirectURI")
 var ytAPIKey = os.Getenv("ytAPIKey")
+var twitchToken = os.Getenv("twitchToken")
 
 type Config struct {
-	twitchToken string
+	twitchClientID     string
+	twitchClientSecret string
+	redirectURI        string
+	ytAPIKey           string
+	twitchToken        string
 }
 
-var config = Config{}
-
-func storeToken(token string) {
-	config.twitchToken = token
+var config = Config{
+	twitchClientID:     twitchClientID,
+	twitchClientSecret: twitchClientSecret,
+	redirectURI:        redirectURI,
+	ytAPIKey:           ytAPIKey,
+	twitchToken:        twitchToken,
 }
 
 func main() {
@@ -33,15 +38,15 @@ func main() {
 
 	music.InitMusicQueue()
 
-	e.GET("/auth", func(c echo.Context) error {
-		authURL := fmt.Sprintf("https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=%s&redirect_uri=%s&scope=chat:read+chat:edit",
-			twitchClientID, redirectURI)
-		return c.Redirect(http.StatusFound, authURL)
-	})
+	// e.GET("/auth", func(c echo.Context) error {
+	// 	authURL := fmt.Sprintf("https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=%s&redirect_uri=%s&scope=chat:read+chat:edit",
+	// 		twitchClientID, redirectURI)
+	// 	return c.Redirect(http.StatusFound, authURL)
+	// })
 
-	e.GET("/auth/callback", handleCallback)
+	// e.GET("/auth/callback", twitchAPIKEYhandleCallback)
 
-	e.GET("/health", func(c echo.Context) error {
+	e.GET("/healthz", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, map[string]string{"status": "UP", "token": config.twitchToken})
 	})
 
@@ -59,21 +64,17 @@ func main() {
 	e.Logger.Fatal(e.Start(":8080"))
 }
 
-func handleCallback(c echo.Context) error {
-	code := c.QueryParam("code")
-	if code == "" {
-		return c.String(http.StatusBadRequest, "Code not provided")
-	}
+// func twitchAPIKEYhandleCallback(c echo.Context) error {
+// 	code := c.QueryParam("code")
+// 	if code == "" {
+// 		return c.String(http.StatusBadRequest, "Code not provided")
+// 	}
 
-	token, err := consumer.ExchangeCodeForToken(code, twitchClientID, twitchClientSecret, redirectURI)
-	if err != nil {
-		log.Printf("Error exchanging code for token: %v\n", err)
-		return c.String(http.StatusInternalServerError, "Error retrieving access token")
-	}
+// 	token, err := consumer.ExchangeCodeForToken(code, twitchClientID, twitchClientSecret, redirectURI)
+// 	if err != nil {
+// 		log.Printf("Error exchanging code for token: %v\n", err)
+// 		return c.String(http.StatusInternalServerError, "Error retrieving access token")
+// 	}
 
-	storeToken(token)
-
-	go consumer.ConnectAndConsumeTwitchChat("#midlin_made", config.twitchToken)
-
-	return c.JSON(http.StatusOK, map[string]string{"access_token": token})
-}
+// 	return c.JSON(http.StatusOK, map[string]string{"access_token": token})
+// }

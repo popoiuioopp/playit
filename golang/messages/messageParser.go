@@ -37,7 +37,7 @@ func ParseSongRequest(msg Message) *music.SongRequest {
 
 // HandleMessage processes incoming messages and checks for song requests
 func HandleMessage(msg Message) {
-	AddMessage(msg)
+	// AddMessage(msg)
 
 	// Check if the message is a song request
 	if songRequest := ParseSongRequest(msg); songRequest != nil {
