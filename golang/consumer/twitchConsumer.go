@@ -3,6 +3,7 @@ package consumer
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"net/url"
@@ -13,39 +14,47 @@ import (
 )
 
 type TokenResponse struct {
-	AccessToken  string `json:"access_token"`
-	RefreshToken string `json:"refresh_token"`
-	ExpiresIn    int    `json:"expires_in"`
-	TokenType    string `json:"token_type"`
+	AccessToken string `json:"access_token"`
+	ExpiresIn   int    `json:"expires_in"`
+	TokenType   string `json:"token_type"`
 }
 
-func ExchangeCodeForToken(code, twitchClientID, twitchClientSecret, redirectURI string) (string, error) {
-	data := url.Values{}
-	data.Set("client_id", twitchClientID)
-	data.Set("client_secret", twitchClientSecret)
-	data.Set("code", code)
-	data.Set("grant_type", "authorization_code")
-	data.Set("redirect_uri", redirectURI)
+// GetTwitchCredential retrieves an app access token using the client credentials grant flow.
+func GetTwitchCredential(clientId, clientSecret string) (string, error) {
+	apiURL := "https://id.twitch.tv/oauth2/token"
 
-	req, err := http.NewRequest("POST", "https://id.twitch.tv/oauth2/token", bytes.NewBufferString(data.Encode()))
+	// Prepare the form data
+	data := url.Values{}
+	data.Set("client_id", clientId)
+	data.Set("client_secret", clientSecret)
+	data.Set("grant_type", "client_credentials")
+
+	// Create a POST request
+	req, err := http.NewRequest("POST", apiURL, bytes.NewBufferString(data.Encode()))
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to create request: %v", err)
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
+	// Make the request
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to make API request: %v", err)
 	}
 	defer resp.Body.Close()
 
-	var tokenResp TokenResponse
-	if err := json.NewDecoder(resp.Body).Decode(&tokenResp); err != nil {
-		return "", err
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("received non-200 status code: %d", resp.StatusCode)
 	}
 
-	return tokenResp.AccessToken, nil
+	// Parse the response
+	var result TokenResponse
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return "", fmt.Errorf("failed to decode response: %v", err)
+	}
+
+	return result.AccessToken, nil
 }
 
 func ConnectAndConsumeTwitchChat(channelName, twitchToken string) {

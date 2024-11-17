@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 	"os"
 
@@ -20,34 +21,30 @@ var twitchToken = os.Getenv("twitchToken")
 type Config struct {
 	twitchClientID     string
 	twitchClientSecret string
-	redirectURI        string
 	ytAPIKey           string
-	twitchToken        string
 }
 
 var config = Config{
 	twitchClientID:     twitchClientID,
 	twitchClientSecret: twitchClientSecret,
-	redirectURI:        redirectURI,
 	ytAPIKey:           ytAPIKey,
-	twitchToken:        twitchToken,
 }
 
 func main() {
 	e := echo.New()
 
 	music.InitMusicQueue()
-
-	// e.GET("/auth", func(c echo.Context) error {
-	// 	authURL := fmt.Sprintf("https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=%s&redirect_uri=%s&scope=chat:read+chat:edit",
-	// 		twitchClientID, redirectURI)
-	// 	return c.Redirect(http.StatusFound, authURL)
-	// })
-
-	// e.GET("/auth/callback", twitchAPIKEYhandleCallback)
+	go music.ProcessMusicQueue()
+	go consumer.StartYouTubeChatListener("UC3H9YWQl2tNpVOa4AYfJexw", ytAPIKey)
+	token, err := consumer.GetTwitchCredential(config.twitchClientID, config.twitchClientSecret)
+	if err == nil {
+		consumer.ConnectAndConsumeTwitchChat("aiiwan", token)
+	} else {
+		log.Printf("An Error occurs on twitch consumer %v\n", err)
+	}
 
 	e.GET("/healthz", func(c echo.Context) error {
-		return c.JSON(http.StatusOK, map[string]string{"status": "UP", "token": config.twitchToken})
+		return c.JSON(http.StatusOK, map[string]string{"status": "UP"})
 	})
 
 	e.GET("/debug/messages", func(c echo.Context) error {
@@ -58,23 +55,5 @@ func main() {
 		return c.JSON(http.StatusOK, music.GetMusicQueue())
 	})
 
-	go music.ProcessMusicQueue()
-	go consumer.StartYouTubeChatListener("UC3H9YWQl2tNpVOa4AYfJexw", ytAPIKey)
-
 	e.Logger.Fatal(e.Start(":8080"))
 }
-
-// func twitchAPIKEYhandleCallback(c echo.Context) error {
-// 	code := c.QueryParam("code")
-// 	if code == "" {
-// 		return c.String(http.StatusBadRequest, "Code not provided")
-// 	}
-
-// 	token, err := consumer.ExchangeCodeForToken(code, twitchClientID, twitchClientSecret, redirectURI)
-// 	if err != nil {
-// 		log.Printf("Error exchanging code for token: %v\n", err)
-// 		return c.String(http.StatusInternalServerError, "Error retrieving access token")
-// 	}
-
-// 	return c.JSON(http.StatusOK, map[string]string{"access_token": token})
-// }
