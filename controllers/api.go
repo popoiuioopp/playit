@@ -39,7 +39,7 @@ func getDebugMessages(c echo.Context) error {
 }
 
 func getDebugQueue(c echo.Context) error {
-	return c.JSON(http.StatusOK, music.GetMusicQueue())
+	return c.JSON(http.StatusOK, music.GetMusicQueue(music.GetTodayPerformanceID()))
 }
 
 func handleAuthCallback(c echo.Context, configs *models.Config) error {
