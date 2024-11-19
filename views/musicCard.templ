@@ -19,6 +19,7 @@ templ MusicCard(queue []models.SongRequest) {
 				<span class="song-requester">
 					Requester: { song.Requester }
 				</span>
+				<span>- Status: { String(song.Status) } </span>
 			</li>
 		}
 	</ul>

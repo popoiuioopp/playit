@@ -30,9 +30,10 @@ func ParseSongRequest(msg models.Message) *models.SongRequest {
 	}
 
 	return &models.SongRequest{
-		Requester: msg.User,
-		SongName:  songName,
-		Artist:    artist,
+		Requester:     msg.User,
+		SongName:      songName,
+		Artist:        artist,
+		PerformanceID: music.GetTodayPerformanceID(),
 	}
 }
 

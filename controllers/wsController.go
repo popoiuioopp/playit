@@ -37,7 +37,7 @@ func HandleWebSocket(c echo.Context) error {
 	log.Println("Client connected")
 
 	// Render the initial music queue as HTML and send it to the client
-	initialQueue := music.GetMusicQueue()
+	initialQueue := music.GetMusicQueue(music.GetTodayPerformanceID())
 	var buf bytes.Buffer
 	if err := views.MusicCard(initialQueue).Render(context.Background(), &buf); err != nil {
 		log.Printf("Error rendering MusicCard component: %v\n", err)
