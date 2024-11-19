@@ -9,7 +9,7 @@ import (
 var prefix = "!ขอเพลง"
 
 // ParseSongRequest checks if the message is a song request based on the command prefix
-func ParseSongRequest(msg Message) *models.SongRequest {
+func ParseSongRequest(msg models.Message) *models.SongRequest {
 	if !strings.HasPrefix(msg.Content, prefix) {
 		return nil
 	}
@@ -37,7 +37,7 @@ func ParseSongRequest(msg Message) *models.SongRequest {
 }
 
 // HandleMessage processes incoming messages and checks for song requests
-func HandleMessage(msg Message) {
+func HandleMessage(msg models.Message) {
 	// AddMessage(msg)
 
 	// Check if the message is a song request

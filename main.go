@@ -15,7 +15,7 @@ var twitchClientID = os.Getenv("TwitchClientID")
 var twitchClientSecret = os.Getenv("TwitchClientSecret")
 var ytAPIKey = os.Getenv("YtAPIKey")
 var redirectURI = os.Getenv("RedirectURI")
-var twitchChannelName = "ka_beeja"
+var twitchChannelName = "midlin_made"
 var youtubeChannelId = "UC3H9YWQl2tNpVOa4AYfJexw"
 
 var config = models.Config{

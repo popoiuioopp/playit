@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"net/http"
 	"playit/messages"
+	"playit/models"
 	"time"
 
 	YtChat "github.com/abhinavxd/youtube-live-chat-downloader/v2"
@@ -47,7 +48,7 @@ func consumeYouTubeChat(videoURL string) {
 		// Process each chat message
 		for _, msg := range chatMessages {
 			// Create a new message struct and add it to the store
-			parsedMessage := messages.Message{
+			parsedMessage := models.Message{
 				User:      msg.AuthorName,
 				Content:   msg.Message,
 				Timestamp: time.Now(),

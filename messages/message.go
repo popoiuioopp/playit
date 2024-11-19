@@ -1,30 +1,24 @@
 package messages
 
 import (
+	"playit/models"
 	"strings"
 	"sync"
 	"time"
 )
 
-type Message struct {
-	User      string    `json:"user"`
-	Content   string    `json:"content"`
-	Timestamp time.Time `json:"timestamp"`
-	Channel   string    `json:"channel"`
-}
-
 var messageStore = struct {
 	sync.RWMutex
-	Messages []Message
+	Messages []models.Message
 }{}
 
-func AddMessage(msg Message) {
+func AddMessage(msg models.Message) {
 	messageStore.Lock()
 	defer messageStore.Unlock()
 	messageStore.Messages = append(messageStore.Messages, msg)
 }
 
-func GetMessages() []Message {
+func GetMessages() []models.Message {
 	messageStore.RLock()
 	defer messageStore.RUnlock()
 	return messageStore.Messages
@@ -40,7 +34,7 @@ func GetMessages() []Message {
 // - Content: "Hello World!"
 // - Channel: "#ka_beeja"
 // - Timestamp: The current time when the message was parsed.
-func ParseMessage(rawMessage, channelName string) *Message {
+func ParseMessage(rawMessage, channelName string) *models.Message {
 	if strings.Contains(rawMessage, "PRIVMSG") {
 		// Split the tags and the actual message
 		parts := strings.SplitN(rawMessage, " PRIVMSG ", 2)
@@ -61,7 +55,7 @@ func ParseMessage(rawMessage, channelName string) *Message {
 			username = extractUsername(parts[0])
 		}
 
-		return &Message{
+		return &models.Message{
 			User:      username,
 			Content:   content,
 			Timestamp: time.Now(),

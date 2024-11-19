@@ -7,16 +7,10 @@ import (
 	"net/http"
 	"net/url"
 	"playit/messages"
+	"playit/models"
 
 	"github.com/gorilla/websocket"
 )
-
-type TokenResponse struct {
-	AccessToken  string `json:"access_token"`
-	RefreshToken string `json:"refresh_token"`
-	ExpiresIn    int    `json:"expires_in"`
-	TokenType    string `json:"token_type"`
-}
 
 func ExchangeCodeForToken(code, clientID, clientSecret, redirectURI string) (string, error) {
 	data := url.Values{}
@@ -36,7 +30,7 @@ func ExchangeCodeForToken(code, clientID, clientSecret, redirectURI string) (str
 		return "", err
 	}
 	defer resp.Body.Close()
-	var tokenResp TokenResponse
+	var tokenResp models.TokenResponse
 	if err := json.NewDecoder(resp.Body).Decode(&tokenResp); err != nil {
 		return "", err
 	}
@@ -55,7 +49,7 @@ func ConnectAndConsumeTwitchChat(channelName, token string) {
 		log.Println("Auth error:", err)
 		return
 	}
-	if err := conn.WriteMessage(websocket.TextMessage, []byte("NICK ka_beeja")); err != nil {
+	if err := conn.WriteMessage(websocket.TextMessage, []byte("NICK kbj_bot")); err != nil {
 		log.Println("Nick error:", err)
 		return
 	}
