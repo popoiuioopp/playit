@@ -43,7 +43,6 @@ func HandleWebSocket(c echo.Context) error {
 		log.Printf("Error rendering MusicCard component: %v\n", err)
 	} else {
 		htmlContent := buf.String()
-		log.Printf("Sending initial HTML content: %s\n", htmlContent)
 		ws.WriteMessage(websocket.TextMessage, []byte(htmlContent))
 	}
 
