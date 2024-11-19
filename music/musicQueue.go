@@ -24,17 +24,26 @@ func InitMusicQueue() {
 }
 
 // AddSongRequest adds a song request directly to the queue
-func AddSongRequest(song models.SongRequest) {
+func AddSongRequest(song models.SongRequest, performanceId string) {
 	musicQueue.Lock()
 	defer musicQueue.Unlock()
 
-	// Generate a unique ID for the song
-	song.ID = len(musicQueue.Queues[song.PerformanceID]) + 1
-	song.Status = models.StatusInQueue
+	// Check for duplicates
+	for _, queuedSong := range musicQueue.Queues[performanceId] {
+		if queuedSong.SongName == song.SongName &&
+			queuedSong.Artist == song.Artist &&
+			queuedSong.Requester == song.Requester {
+			log.Printf("Duplicate song request ignored: %+v\n", song)
+			return
+		}
+	}
 
-	musicQueue.Queues[song.PerformanceID] = append(musicQueue.Queues[song.PerformanceID], song)
+	// Add the song to the queue
+	musicQueue.Queues[performanceId] = append(musicQueue.Queues[performanceId], song)
 	log.Printf("Added song request: %+v\n", song)
-	realtime.BroadcastMessage(musicQueue.Queues[song.PerformanceID])
+
+	// Broadcast the updated queue
+	realtime.BroadcastMessage(musicQueue.Queues[performanceId])
 }
 
 func SkipSong(performanceID string) {
@@ -101,10 +110,11 @@ func EnqueueSongRequest(song models.SongRequest) {
 // ProcessMusicQueue listens for song requests from the channel and adds them to the queue
 func ProcessMusicQueue() {
 	for song := range musicQueueChan {
-		AddSongRequest(song)
+		AddSongRequest(song, GetTodayPerformanceID())
 	}
 }
 
 func GetTodayPerformanceID() string {
-	return time.Now().Format("2024-11-17") // e.g., "2024-11-17"
+	current_time := time.Now()
+	return current_time.Format("2006-01-02") // e.g., "2024-11-19"
 }
