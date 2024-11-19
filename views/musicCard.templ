@@ -5,14 +5,20 @@ import "playit/models"
 templ MusicCard(queue []models.SongRequest) {
 	<ul id="queue-list" hx-swap-oob="innerHTML">
 		for _, song := range queue {
-			<li>
-				Song Name: <strong>{ song.SongName }</strong>
-				if song.Artist == "" {
-					by Artist: Unknown Artist
-				} else {
-					by Artist: <strong>{ song.Artist }</strong>
-				}
-				Requester: { song.Requester }
+			<li class="song-item">
+				<span class="song-name">
+					Song Name: <strong>{ song.SongName }</strong>
+				</span>
+				<span class="song-artist">
+					if song.Artist == "" {
+						by Artist: <em>Unknown Artist</em>
+					} else {
+						by Artist: <strong>{ song.Artist }</strong>
+					}
+				</span>
+				<span class="song-requester">
+					Requester: { song.Requester }
+				</span>
 			</li>
 		}
 	</ul>
