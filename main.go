@@ -5,6 +5,7 @@ import (
 
 	"playit/consumer"
 	"playit/controllers"
+	"playit/db"
 	"playit/models"
 	"playit/music"
 
@@ -29,6 +30,8 @@ var config = models.Config{
 
 func main() {
 	e := echo.New()
+
+	db.ConnectDB()
 
 	music.InitMusicQueue()
 	go music.ProcessMusicQueue()
