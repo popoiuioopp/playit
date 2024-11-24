@@ -57,7 +57,7 @@ func HandleMessage(platform, channelID string, msg twitch.PrivateMessage) {
 			return
 		}
 
-		// Broadcast the updated queue to clients
-		realtime.BroadcastMessage(channelID, queue)
+		// Broadcast the updated queue to subscribed performers
+		realtime.BroadcastMessage(channelID, platform, queue)
 	}
 }
