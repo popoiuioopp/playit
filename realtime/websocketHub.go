@@ -11,25 +11,26 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-var clients = make(map[*websocket.Conn]bool)
-var clientsMutex sync.Mutex
-
-// RegisterClient adds a new WebSocket client to the map
-func RegisterClient(client *websocket.Conn) {
-	clientsMutex.Lock()
-	defer clientsMutex.Unlock()
-	clients[client] = true
+var performerClients = struct {
+	sync.RWMutex
+	Clients map[string][]*websocket.Conn // Key: performer username
+}{
+	Clients: make(map[string][]*websocket.Conn),
 }
 
-// UnregisterClient removes a WebSocket client from the map
-func UnregisterClient(client *websocket.Conn) {
-	clientsMutex.Lock()
-	defer clientsMutex.Unlock()
-	delete(clients, client)
+// RegisterClientForPerformer associates a WebSocket client with a performer
+func RegisterClientForPerformer(client *websocket.Conn, performer string) {
+	performerClients.Lock()
+	defer performerClients.Unlock()
+	performerClients.Clients[performer] = append(performerClients.Clients[performer], client)
 }
 
-// BroadcastMessage sends a message to all connected WebSocket clients
-func BroadcastMessage(queue []models.SongRequest) {
+// UnregisterClientForPerformer removes a WebSocket client from a performer
+func UnregisterClient(performer string, conn *websocket.Conn) {
+	removeConnection(performer, conn)
+}
+
+func BroadcastMessage(channelID string, queue []models.SongRequest) {
 	// Render the MusicCard component
 	var buf bytes.Buffer
 	if err := views.MusicCard(queue).Render(context.Background(), &buf); err != nil {
@@ -37,20 +38,45 @@ func BroadcastMessage(queue []models.SongRequest) {
 		return
 	}
 	htmlContent := buf.String()
-	log.Printf("Broadcasting HTML content: %s\n", htmlContent)
 
-	clientsMutex.Lock()
-	defer clientsMutex.Unlock()
+	// Lock the performerClients map
+	performerClients.RLock()
+	defer performerClients.RUnlock()
 
-	// Send the rendered HTML to all connected clients
-	for client := range clients {
-		err := client.WriteMessage(websocket.TextMessage, []byte(htmlContent))
-		if err != nil {
-			log.Printf("WebSocket write error: %v\n", err)
-			client.Close()
-			delete(clients, client)
-		} else {
-			log.Println("HTML content sent to client")
+	// Find all clients connected to this channel ID
+	for performer, connections := range performerClients.Clients {
+		log.Printf("Checking connections for performer: %s\n", performer)
+
+		for _, conn := range connections {
+			err := conn.WriteMessage(websocket.TextMessage, []byte(htmlContent))
+			if err != nil {
+				log.Printf("WebSocket write error for performer %s: %v\n", performer, err)
+				conn.Close()
+				// Remove the broken connection
+				removeConnection(performer, conn)
+			} else {
+				log.Printf("HTML content sent to client of performer %s for channel %s\n", performer, channelID)
+			}
 		}
+	}
+}
+
+// Helper function to remove a connection from the performerClients map
+func removeConnection(performer string, conn *websocket.Conn) {
+	performerClients.Lock()
+	defer performerClients.Unlock()
+
+	connections := performerClients.Clients[performer]
+	for i, c := range connections {
+		if c == conn {
+			// Remove the connection from the slice
+			performerClients.Clients[performer] = append(connections[:i], connections[i+1:]...)
+			break
+		}
+	}
+
+	// Clean up if no connections remain for the performer
+	if len(performerClients.Clients[performer]) == 0 {
+		delete(performerClients.Clients, performer)
 	}
 }

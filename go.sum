@@ -1,9 +1,9 @@
 github.com/a-h/templ v0.2.793 h1:Io+/ocnfGWYO4VHdR0zBbf39PQlnzVCVVD+wEEs6/qY=
 github.com/a-h/templ v0.2.793/go.mod h1:lq48JXoUvuQrU0VThrK31yFwdRjTCnIE5bcPCM9IP1w=
-github.com/abhinavxd/youtube-live-chat-downloader/v2 v2.0.3 h1:rJRsl52IhgD5yaUBV7npuyqxB5h5TfILn7xs0/JV220=
-github.com/abhinavxd/youtube-live-chat-downloader/v2 v2.0.3/go.mod h1:TrUogg8mrebgMD/JU094CmSXn3yKrt+CZjiDL3YtmMw=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
+github.com/gempir/go-twitch-irc/v4 v4.2.0 h1:OCeff+1aH4CZIOxgKOJ8dQjh+1ppC6sLWrXOcpGZyq4=
+github.com/gempir/go-twitch-irc/v4 v4.2.0/go.mod h1:QsOMMAk470uxQ7EYD9GJBGAVqM/jDrXBNbuePfTauzg=
 github.com/google/go-cmp v0.6.0 h1:ofyhxvXcZhMsU5ulbFiLKl/XBFqE1GSq7atu8tAmTRI=
 github.com/google/go-cmp v0.6.0/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
 github.com/gorilla/websocket v1.5.3 h1:saDtZ6Pbx/0u+bgYQ3q96pZgCzfhKXGPqt7kZ72aNNg=

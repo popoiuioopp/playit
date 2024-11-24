@@ -1,18 +1,19 @@
 package models
 
-type SongStatus string
-
-const (
-	StatusInQueue SongStatus = "in_queue"
-	StatusPlaying SongStatus = "playing"
-	StatusPlayed  SongStatus = "played"
-)
-
 type SongRequest struct {
-	ID            int        `json:"id"`               // Unique ID for each song in the queue
-	Requester     string     `json:"requester"`        // Who requested the song
-	SongName      string     `json:"song_name"`        // Name of the song
-	Artist        string     `json:"artist,omitempty"` // Artist of the song
-	Status        SongStatus `json:"status"`           // Status of the song
-	PerformanceID string     `json:"performance"`      // ID for the performance
+	Requester         string `json:"requester"`          // Who requested the song
+	SongName          string `json:"song_name"`          // Name of the song
+	Artist            string `json:"artist,omitempty"`   // Artist of the song
+	Status            string `json:"status"`             // Status of the song
+	RequesterPlatform string `json:"requester_platform"` // Platform of the requester (eg. youtube, twitch)
+}
+
+type Request struct {
+	ID                string `json:"id"`
+	PerformanceId     string `json:"performance_id"`
+	Music             string `json:"music"`
+	Artist            string `json:"artist"`
+	Status            string `json:"status"`
+	Requester         string `json:"requester"`
+	RequesterPlatform string `json:"requester_platform"`
 }

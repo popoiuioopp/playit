@@ -7,7 +7,6 @@ import (
 	"playit/controllers"
 	"playit/db"
 	"playit/models"
-	"playit/music"
 
 	"github.com/labstack/echo/v4"
 )
@@ -16,16 +15,14 @@ var twitchClientID = os.Getenv("TwitchClientID")
 var twitchClientSecret = os.Getenv("TwitchClientSecret")
 var ytAPIKey = os.Getenv("YtAPIKey")
 var redirectURI = os.Getenv("RedirectURI")
-var twitchChannelName = "midlin_made"
-var youtubeChannelId = "UC3H9YWQl2tNpVOa4AYfJexw"
+var twitchToken = os.Getenv("TwitchToken")
 
 var config = models.Config{
 	TwitchClientID:     twitchClientID,
 	TwitchClientSecret: twitchClientSecret,
 	YtAPIKey:           ytAPIKey,
 	RedirectURI:        redirectURI,
-	TwitchChannelName:  twitchChannelName,
-	YoutubeChannelId:   youtubeChannelId,
+	TwitchToken:        twitchToken,
 }
 
 func main() {
@@ -33,9 +30,7 @@ func main() {
 
 	db.ConnectDB()
 
-	music.InitMusicQueue()
-	go music.ProcessMusicQueue()
-	go consumer.StartYouTubeChatListener("UC3H9YWQl2tNpVOa4AYfJexw", config.YtAPIKey)
+	go consumer.StartUpConsumes(config)
 
 	e.Static("/static", "public")
 

@@ -1,21 +1,25 @@
 package messages
 
 import (
+	"log"
 	"playit/models"
-	"playit/music"
+	"playit/realtime"
+	"playit/repository"
 	"strings"
+
+	"github.com/gempir/go-twitch-irc/v4"
 )
 
-var prefix = "!ขอเพลง"
+var prefix = "ขอเพลง"
 
 // ParseSongRequest checks if the message is a song request based on the command prefix
-func ParseSongRequest(msg models.Message) *models.SongRequest {
-	if !strings.HasPrefix(msg.Content, prefix) {
+func ParseSongRequest(msg twitch.PrivateMessage) *models.SongRequest {
+	if !strings.HasPrefix(msg.Message, prefix) {
 		return nil
 	}
 
 	// Remove the command prefix and trim whitespace
-	content := strings.TrimSpace(strings.TrimPrefix(msg.Content, prefix))
+	content := strings.TrimSpace(strings.TrimPrefix(msg.Message, prefix))
 
 	// Split into song name and optional artist
 	parts := strings.SplitN(content, " - ", 2)
@@ -30,20 +34,30 @@ func ParseSongRequest(msg models.Message) *models.SongRequest {
 	}
 
 	return &models.SongRequest{
-		Requester:     msg.User,
-		SongName:      songName,
-		Artist:        artist,
-		PerformanceID: music.GetTodayPerformanceID(),
+		Requester: msg.User.Name,
+		SongName:  songName,
+		Artist:    artist,
 	}
 }
 
 // HandleMessage processes incoming messages and checks for song requests
-func HandleMessage(msg models.Message) {
-	// AddMessage(msg)
-
-	// Check if the message is a song request
+func HandleMessage(platform, channelID string, msg twitch.PrivateMessage) {
 	if songRequest := ParseSongRequest(msg); songRequest != nil {
-		// Use the EnqueueSongRequest function instead of directly accessing the channel
-		music.EnqueueSongRequest(*songRequest)
+		// Insert the song request into the database
+		err := repository.InsertSongRequest(channelID, platform, songRequest)
+		if err != nil {
+			log.Printf("Error inserting song request: %v\n", err)
+			return
+		}
+
+		// Fetch the updated queue for the channel
+		queue, err := repository.GetSongRequestsByChannelID(channelID)
+		if err != nil {
+			log.Printf("Error fetching song requests for channel %s: %v\n", channelID, err)
+			return
+		}
+
+		// Broadcast the updated queue to clients
+		realtime.BroadcastMessage(channelID, queue)
 	}
 }

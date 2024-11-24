@@ -6,8 +6,8 @@ import (
 	"log"
 	"net/http"
 	"playit/models"
-	"playit/music"
 	"playit/realtime"
+	"playit/repository"
 	"playit/views"
 
 	"github.com/gorilla/websocket"
@@ -26,6 +26,11 @@ func RegisterWSRoutes(e *echo.Echo, configs *models.Config) {
 
 // HandleWebSocket handles the WebSocket connection
 func HandleWebSocket(c echo.Context) error {
+	performer := c.QueryParam("performer")
+	if performer == "" {
+		return c.String(http.StatusBadRequest, "Performer not specified")
+	}
+
 	ws, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
 		log.Printf("WebSocket upgrade error: %v\n", err)
@@ -33,25 +38,36 @@ func HandleWebSocket(c echo.Context) error {
 	}
 	defer ws.Close()
 
-	realtime.RegisterClient(ws)
-	log.Println("Client connected")
+	// Register the client for the performer
+	realtime.RegisterClientForPerformer(ws, performer)
+	log.Printf("Client connected for performer: %s\n", performer)
 
-	// Render the initial music queue as HTML and send it to the client
-	initialQueue := music.GetMusicQueue(music.GetTodayPerformanceID())
+	// Fetch the initial queue from the database for the performer
+	initialQueue, err := repository.GetSongRequestsByUserName(performer)
+	if err != nil {
+		log.Printf("Error fetching initial queue for performer %s: %v\n", performer, err)
+		return err
+	}
+
+	// Render the MusicCard component with the initial queue
 	var buf bytes.Buffer
 	if err := views.MusicCard(initialQueue).Render(context.Background(), &buf); err != nil {
-		log.Printf("Error rendering MusicCard component: %v\n", err)
+		log.Printf("Error rendering MusicCard component for performer %s: %v\n", performer, err)
 	} else {
 		htmlContent := buf.String()
-		ws.WriteMessage(websocket.TextMessage, []byte(htmlContent))
+		// Send the initial queue to the client
+		if err := ws.WriteMessage(websocket.TextMessage, []byte(htmlContent)); err != nil {
+			log.Printf("WebSocket write error for performer %s: %v\n", performer, err)
+			return err
+		}
 	}
 
 	// Listen for client disconnection
 	for {
 		_, _, err := ws.ReadMessage()
 		if err != nil {
-			log.Println("Client disconnected:", err)
-			realtime.UnregisterClient(ws)
+			log.Printf("Client disconnected for performer: %s, error: %v\n", performer, err)
+			realtime.UnregisterClient(performer, ws)
 			break
 		}
 	}

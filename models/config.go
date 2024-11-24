@@ -6,6 +6,4 @@ type Config struct {
 	YtAPIKey           string
 	TwitchToken        string
 	RedirectURI        string
-	TwitchChannelName  string
-	YoutubeChannelId   string
 }

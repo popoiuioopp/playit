@@ -1,14 +1,14 @@
 package views
 
-templ HomePage(title string) {
-	@BaseLayout(title, HomeContent())
+templ HomePage(title string, userName string) {
+	@BaseLayout(title, HomeContent(userName))
 }
 
-templ HomeContent() {
+templ HomeContent(userName string) {
 	<div>
 		<div id="music-queue">
 			<h2>Current Music Queue</h2>
-			<div id="queue-list" hx-ext="ws" ws-connect="/ws/queue" hx-swap-oob="innerHTML"></div>
+			<div id="queue-list" hx-ext="ws" ws-connect={ "/ws/queue?performer=" + userName } hx-swap-oob="innerHTML"></div>
 		</div>
 	</div>
 }
