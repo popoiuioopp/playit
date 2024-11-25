@@ -1,0 +1,36 @@
+package views
+
+templ RegisterPage(title string) {
+	@BaseLayout(title, RegisterContent())
+}
+
+templ RegisterContent() {
+	<div>
+		<p>Register</p>
+		<hr/>
+		<form method="POST" action="/api/register" autocomplete="off">
+			<div>
+				<label for="username">Username</label>
+				<input
+					type="text"
+					name="username"
+					id="username"
+					class="form-control"
+					hx-post="/check-username"
+					hx-target="#username-err"
+					hx-trigger="keyup changed delay:500ms"
+				/>
+				<div id="username-err"></div>
+			</div>
+			<div>
+				<label for="password1">Password</label>
+				<input type="password" name="password1" id="password1" class="form-control"/>
+			</div>
+			<div>
+				<label for="password2">Confirm Password</label>
+				<input type="password" name="password2" id="password2" class="form-control"/>
+			</div>
+			<button type="submit">Register</button>
+		</form>
+	</div>
+}

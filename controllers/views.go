@@ -9,11 +9,25 @@ import (
 
 // RegisterViewRoutes sets up the view routes
 func RegisterViewRoutes(e *echo.Echo) {
+	e.GET("/", HomePageHandler)
+	e.GET("/register", RegisterPageHandler)
+	e.GET("/login", LoginPageHandler)
 	e.GET("/:userName", MusicQueueHandler)
 }
 
-// MusicQueueHandler renders the MusicQueue component.
+func HomePageHandler(c echo.Context) error {
+	return Render(c, http.StatusOK, views.HomePage())
+}
+
+func RegisterPageHandler(c echo.Context) error {
+	return Render(c, http.StatusOK, views.RegisterPage("Register"))
+}
+
+func LoginPageHandler(c echo.Context) error {
+	return Render(c, http.StatusOK, views.LoginPage())
+}
+
 func MusicQueueHandler(c echo.Context) error {
 	userName := c.Param("userName")
-	return Render(c, http.StatusOK, views.HomePage("Music Request App", userName))
+	return Render(c, http.StatusOK, views.QueuePage("Music Request App", userName))
 }

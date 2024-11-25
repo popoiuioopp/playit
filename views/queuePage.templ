@@ -1,10 +1,10 @@
 package views
 
-templ HomePage(title string, userName string) {
-	@BaseLayout(title, HomeContent(userName))
+templ QueuePage(title string, userName string) {
+	@BaseLayout(title, QueueContent(userName))
 }
 
-templ HomeContent(userName string) {
+templ QueueContent(userName string) {
 	<div>
 		<div id="music-queue">
 			<h2>Current Music Queue</h2>
